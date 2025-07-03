@@ -1,5 +1,6 @@
 import requests
-from secret import TELEGRAM_TOKEN
+import os
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 
 
 def send_telegram_message(user_id, message):

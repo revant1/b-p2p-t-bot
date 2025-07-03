@@ -1,4 +1,5 @@
-from secret import TELEGRAM_TOKEN
+import os
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 from telegram.ext import CommandHandler, MessageHandler, filters
 from telegram.ext import Application
 from bot.telegram_bot import add_alert, prices
