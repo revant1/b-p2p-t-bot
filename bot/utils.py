@@ -1,34 +1,28 @@
-import requests
+from telegram import Bot
+from dotenv import load_dotenv
 import os
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
+
+load_dotenv()
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 
-def send_telegram_message(user_id, message):
+async def send_telegram_message(user_id, message, parse_mode="HTML"):
     """
-    Send a message to a user from a Telegram bot.
+    Sends a Telegram message asynchronously using the python-telegram-bot library.
 
-    Parameters:
-    user_id (str): Unique identifier for the target user or username of the target channel.
-    message (str): Text of the message to be sent.
-
-    Returns:
-    dict: Response from the Telegram API.
+    :param user_id: Telegram chat ID.
+    :param message: Message to send.
+    :param parse_mode: Telegram parse mode ('HTML', 'Markdown', etc.).
     """
-    # Telegram API endpoint for sending messages
-    send_message_url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-
-    # Parameters for the API request
-    params = {
-        'chat_id': user_id,
-        'text': message,
-        'parse_mode': 'HTML'
-    }
-
-    # Making the request to the Telegram API
-    response = requests.post(send_message_url, params=params)
-
-    # Returning the response as a Python dictionary
-    return response.json()
+    try:
+        await bot.send_message(
+            chat_id=user_id,
+            text=message,
+            parse_mode=parse_mode,
+            disable_web_page_preview=True
+        )
+    except Exception as e:
+        print(f"[send_telegram_message] Error sending message to {user_id}: {e}")
 
 
 def to_float(s):
@@ -40,24 +34,20 @@ def to_float(s):
 
 def format_table(data, columns, html=False):
     """
-    Formats a 2D list into a string representation of a table with fixed column widths.
+    Formats a 2D list into a string representation of a table.
     Optionally formats the output as HTML with bold column names.
 
     :param data: A 2D list of data.
     :param columns: A list of column names.
-    :param html: A boolean indicating whether to format output as HTML.
-    :return: A string representing the data in table format.
+    :param html: Whether to use HTML formatting.
+    :return: Formatted table string.
     """
-    # Determine the maximum width for each column
     col_widths = [max(len(str(item)) for item in column_data) for column_data in zip(*data)]
-
     formatted_rows = []
     for row in data:
         formatted_row = []
         for i, col in enumerate(columns):
-            # Wrap column names in <b></b> if html is True
             col_name = f"<b>{col}</b>" if html else col
-            # Format each item to have a fixed width, left aligned
             formatted_item = f"{col_name}: {str(row[i]).ljust(col_widths[i])}"
             formatted_row.append(formatted_item)
         formatted_rows.append(",   ".join(formatted_row))
